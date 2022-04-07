@@ -2,6 +2,10 @@
 
 # https://github.com/pi-hole/docker-pi-hole/blob/master/README.md
 
+if docker ps | grep pihole; then docker rm -f pihole; fi
+
+docker build -t baitable .
+
 PIHOLE_BASE="${PIHOLE_BASE:-$(pwd)}"
 [[ -d "$PIHOLE_BASE" ]] || mkdir -p "$PIHOLE_BASE" || { echo "Couldn't create storage directory: $PIHOLE_BASE"; exit 1; }
 
@@ -13,13 +17,14 @@ docker run -d \
     -e TZ="America/Chicago" \
     -v "${PIHOLE_BASE}/etc-pihole:/etc/pihole" \
     -v "${PIHOLE_BASE}/etc-dnsmasq.d:/etc/dnsmasq.d" \
+    -v "$PWD/../AdminLTE:/var/www/html/admin" \
     --dns=127.0.0.1 --dns=1.1.1.1 \
     --restart=unless-stopped \
     --hostname pi.hole \
     -e VIRTUAL_HOST="pi.hole" \
     -e PROXY_LOCATION="pi.hole" \
     -e ServerIP="127.0.0.1" \
-    pihole/pihole:latest
+    baitable
 
 printf 'Starting up pihole container '
 for i in $(seq 1 20); do
