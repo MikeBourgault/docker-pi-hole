@@ -7,6 +7,8 @@ if docker ps | grep pihole; then docker rm -f pihole; fi
 docker build -t baitable .
 
 PIHOLE_BASE="${PIHOLE_BASE:-$(pwd)}"
+SERVER_IP="${SERVER_IP:-127.0.0.1}"
+
 [[ -d "$PIHOLE_BASE" ]] || mkdir -p "$PIHOLE_BASE" || { echo "Couldn't create storage directory: $PIHOLE_BASE"; exit 1; }
 
 # Note: ServerIP should be replaced with your external ip.
@@ -23,7 +25,7 @@ docker run -d \
     --hostname pi.hole \
     -e VIRTUAL_HOST="pi.hole" \
     -e PROXY_LOCATION="pi.hole" \
-    -e ServerIP="127.0.0.1" \
+    -e ServerIP="$SERVER_IP" \
     baitable
 
 printf 'Starting up pihole container '
